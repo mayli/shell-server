@@ -18,6 +18,16 @@ rsync -aAX /etc-git/ /etc/
 rm -rf /etc-git
 git -C /etc clean -df
 
+# Apply hypervisor/container patches
+VIRT=$(systemd-detect-virt)
+if [ -n "$VIRT" ]; then
+        for s in ./patches/${VIRT}*.sh; do
+                [ -f "$s" ] || continue
+                echo applying patch: $s;
+                ./$s
+        done
+fi
+
 # Restore correct permissions in /etc
 # This requires having the correct /etc/passwd and /etc/group,
 # which should be in /etc-git.
